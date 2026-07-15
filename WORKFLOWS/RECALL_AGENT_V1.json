@@ -1,0 +1,231 @@
+{
+  "name": "RECALL_AGENT_V1",
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -32,
+        -160
+      ],
+      "id": "03e7610b-90b1-45a4-99a5-66e710827349",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "273c93ed-6d78-4eae-a424-c42201c973dc",
+              "name": "user_id",
+              "value": "=a913f8ed-cd7c-4caa-a137-7a8379dffb1a",
+              "type": "string"
+            },
+            {
+              "id": "c41573e0-76a3-47d8-9058-c8cdb6c0fa31",
+              "name": "user_message",
+              "value": "help me find an internship",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        208,
+        0
+      ],
+      "id": "60c5d0e2-b245-4c25-a623-e4d4b8746908",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "url": "https://hzpxkldfqipzjlbtzqqs.supabase.co/rest/v1/memories",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "user_id",
+              "value": "=eq.{{ $json.user_id }}"
+            },
+            {
+              "name": "select",
+              "value": "memory,created_at"
+            },
+            {
+              "name": "order",
+              "value": "created_at.desc"
+            }
+          ]
+        },
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "apikey",
+              "value": "YOUR_SUPABASE_ANON_KEY"
+            },
+            {
+              "name": "Authorization",
+              "value": "Bearer YOUR_SUPABASE_ANON_KEY"
+            },
+            {
+              "name": "Accept",
+              "value": "application/json"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        416,
+        0
+      ],
+      "id": "c18caa2c-a8c0-454e-bf4e-f14a6f7b7393",
+      "name": "FETCH_MEMORIES",
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "jsCode": "const memories = $input.first().json;\n\nconst userData = $('Edit Fields').first().json;\n\nif (!Array.isArray(memories) || memories.length === 0) {\n  return [{\n    json: {\n      user_id: userData.user_id,\n      user_message: userData.user_message,\n      memory_context: \"\"\n    }\n  }];\n}\n\nconst memory_context = memories\n  .map(item => `- ${item.memory}`)\n  .join(\"\\n\");\n\nreturn [{\n  json: {\n    user_id: userData.user_id,\n    user_message: userData.user_message,\n    memory_context\n  }\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        624,
+        0
+      ],
+      "id": "296da780-735b-4a5f-a8ce-d8068263c9ff",
+      "name": "FORMAT_MEMORIES"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://127.0.0.1:11434/api/generate",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "model",
+              "value": "gemma3:4b"
+            },
+            {
+              "name": "prompt",
+              "value": "={{ `You are MORO AI.  Use ONLY the user's stored memories below to answer the question.  Memories: ${$json.memory_context}  Question: ${$json.question}  If the answer is not in memory, politely say that you don't know yet.` }}"
+            },
+            {
+              "name": "stream",
+              "value": "={{ false }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        832,
+        0
+      ],
+      "id": "9c585bf8-3496-4211-b6a8-287334cbdf98",
+      "name": "RECALL_RESPONSE"
+    },
+    {
+      "parameters": {
+        "workflowInputs": {
+          "values": [
+            {
+              "name": "user_id"
+            },
+            {
+              "name": "user_message"
+            },
+            {
+              "name": "memorry_context"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        16,
+        0
+      ],
+      "id": "eb5d8be4-9216-4890-a7b5-284718953184",
+      "name": "When Executed by Another Workflow"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        []
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "FETCH_MEMORIES",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "FETCH_MEMORIES": {
+      "main": [
+        [
+          {
+            "node": "FORMAT_MEMORIES",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "FORMAT_MEMORIES": {
+      "main": [
+        [
+          {
+            "node": "RECALL_RESPONSE",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When Executed by Another Workflow": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "109f9e28-d6d5-4f41-9e3b-d07448bb20ba",
+  "meta": {
+    "instanceId": "71298cc0a45d891fa7d10da2b065192bfba86e4a0d6df20ba65972a131dd3d3e"
+  },
+  "id": "CZrz0g5iNV8HCPqE",
+  "tags": []
+}

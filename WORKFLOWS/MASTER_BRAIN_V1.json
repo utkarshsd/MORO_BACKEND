@@ -1,0 +1,170 @@
+{
+  "name": "MASTER_BRAIN_V1",
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -192,
+        -288
+      ],
+      "id": "0c9b9313-f467-49ce-8170-362f7db49d79",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://127.0.0.1:11434/api/generate",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"model\": \"gemma3:4b\",\n  \"prompt\": \"You are MORO AI, an intelligent personal assistant.\\n\\nKnown information about the user:\\n{{$json.memory_context}}\\n\\nCurrent user message:\\n{{$json.user_message}}\\n\\nYour responsibilities:\\n- Answer general questions accurately.\\n- Help with programming, AI, machine learning, data science, mathematics, and technology.\\n- Help with studying, productivity, writing, brainstorming, and problem-solving.\\n- Explain concepts clearly according to the user's knowledge level.\\n- Personalize responses using the user's stored memories only when they are relevant.\\n\\nRules:\\n- If the memory is not relevant, ignore it completely.\\n- Never invent facts about the user.\\n- If you are uncertain, clearly say you are uncertain instead of making up an answer.\\n- Be concise by default, but provide detailed explanations when the user asks for them.\\n- Format answers using headings and bullet points when they improve readability.\\n- Be friendly, professional, and practical.\\n\\nNow answer the user's message.\",\n  \"stream\": false\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        416,
+        0
+      ],
+      "id": "1b2549d2-edb8-44dc-9a9e-597d95c3602d",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "81bfc775-7442-4491-adfb-2cd7617d603f",
+              "name": "user_id",
+              "value": "={{ $json.user_id }}",
+              "type": "string"
+            },
+            {
+              "id": "bfd18c05-bf6d-4d34-852c-a8ffe17873fd",
+              "name": "user_message",
+              "value": "={{ $json.user_message }}",
+              "type": "string"
+            },
+            {
+              "id": "7305c00b-3fd7-4bcb-86c5-2bfe4dc5a907",
+              "name": "memory_context",
+              "value": "={{ $json.memory_context }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        208,
+        0
+      ],
+      "id": "d3db3f29-f03e-42cf-9f09-5f1f4a91ff2e",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "39977c3c-3fe5-4569-bcd3-b66341421327",
+              "name": "response",
+              "value": "={{$json.general_response}}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        624,
+        0
+      ],
+      "id": "5050e19a-7db4-490f-95a0-ad04b3f9eb8e",
+      "name": "Edit Fields1"
+    },
+    {
+      "parameters": {
+        "workflowInputs": {
+          "values": [
+            {
+              "name": "user_id"
+            },
+            {
+              "name": "user_message"
+            },
+            {
+              "name": "memory_context"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "5ce46988-acb0-42f9-98fd-b8303faa93d8",
+      "name": "When Executed by Another Workflow"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        []
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When Executed by Another Workflow": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "9cb464d7-1b0c-4264-8a80-7b84e390da96",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "71298cc0a45d891fa7d10da2b065192bfba86e4a0d6df20ba65972a131dd3d3e"
+  },
+  "id": "QvtBmyOFy6cVsWht",
+  "tags": []
+}

@@ -1,0 +1,187 @@
+{
+  "name": "MASTER_ROUTER_V1",
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -64,
+        -240
+      ],
+      "id": "81475475-e469-475e-ae8d-a4c02735b85a",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "9f2cbb7b-f45f-4bc8-8502-d6dcd3266d4b",
+              "name": "user_id",
+              "value": "a913f8ed-cd7c-4caa-a137-7a8379dffb1a",
+              "type": "string"
+            },
+            {
+              "id": "4fc3147d-c4aa-4166-9f24-9b54fa251cdf",
+              "name": "user_message",
+              "value": "help me with my portfolio",
+              "type": "string"
+            },
+            {
+              "id": "4fa7e62a-27cd-4f18-8853-4a7e35910de9",
+              "name": "memory_context",
+              "value": "={{ $json.memory_context }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        208,
+        0
+      ],
+      "id": "c6278920-2ade-417b-aa88-97e8d5c53329",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://127.0.0.1:11434/api/generate",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"model\": \"gemma3:4b\",\n  \"prompt\": \"You are MORO Intent Router. Classify the user message into exactly one category: career, gratitude, game, or general. Portfolio, resume, jobs, internships, LinkedIn, projects, coding and AI all belong to career. User message: {{$json.user_message}} Return only one lowercase word.\",\n  \"stream\": false\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        416,
+        0
+      ],
+      "id": "77808d28-19fd-448f-8d44-0453b8127c72",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "140577f2-7093-4d5a-aee6-c10b9a658678",
+              "name": "intent",
+              "value": "={{$json.response.trim().toLowerCase()}}",
+              "type": "string"
+            },
+            {
+              "id": "077402a4-0ab0-4be3-911b-6f2001587928",
+              "name": "user_id",
+              "value": "={{ $('Edit Fields').item.json.user_id }}",
+              "type": "string"
+            },
+            {
+              "id": "3a794a66-c663-436b-b57d-e0dc3521d847",
+              "name": "user_message",
+              "value": "={{ $('Edit Fields').item.json.user_message }}",
+              "type": "string"
+            },
+            {
+              "id": "291371da-d13e-4d72-b1da-c47e80621d6d",
+              "name": "memory_context",
+              "value": "={{ $('Edit Fields').item.json.memory_context }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        624,
+        0
+      ],
+      "id": "d0b665a1-d3ac-4783-b425-e7e0bf133378",
+      "name": "Edit Fields1"
+    },
+    {
+      "parameters": {
+        "workflowInputs": {
+          "values": [
+            {
+              "name": "user_id"
+            },
+            {
+              "name": "user_message"
+            },
+            {
+              "name": "memory_context"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        -80,
+        32
+      ],
+      "id": "ee9d6eb4-cc32-4838-bcd6-0da1b5cce6eb",
+      "name": "When Executed by Another Workflow"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        []
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When Executed by Another Workflow": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "cab4bb96-23e9-491d-ac13-318a7324dc50",
+  "meta": {
+    "instanceId": "71298cc0a45d891fa7d10da2b065192bfba86e4a0d6df20ba65972a131dd3d3e"
+  },
+  "id": "0UHblWn7Wathh1Ku",
+  "tags": []
+}

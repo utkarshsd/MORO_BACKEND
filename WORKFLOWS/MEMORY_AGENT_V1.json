@@ -1,0 +1,288 @@
+{
+  "name": "MEMORY_AGENT_V1",
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        -192
+      ],
+      "id": "a9c303f5-5a5e-42d5-8930-82ec61c35306",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "b122c391-0023-492a-98c2-321a4c8ce327",
+              "name": "user_id",
+              "value": "a913f8ed-cd7c-4caa-a137-7a8379dffb1a",
+              "type": "string"
+            },
+            {
+              "id": "667a366e-3d99-4b0a-a425-8dec5a1e8f37",
+              "name": "user_message",
+              "value": "My favorite sport is cricket",
+              "type": "string"
+            },
+            {
+              "id": "9ff9cb2c-5425-4b2a-9ad5-4d9c6f3f4b53",
+              "name": "memory_context",
+              "value": "={{ $json.ai_response }}\n",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        208,
+        0
+      ],
+      "id": "da78b9bd-9de9-4b68-a688-80aedcc08a4f",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://127.0.0.1:11434/api/generate",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"model\": \"gemma3:4b\",\n  \"prompt\": \"Extract important long-term memories from this message.\\n\\nMessage: {{$json.user_message}}\\n\\nPossible types:\\npreference\\ngoal\\ncareer\\npersonal_fact\\nreminder\\n\\nReturn ONLY valid JSON like:\\n{\\\"memory_type\\\":\\\"preference\\\",\\\"memory\\\":\\\"Favorite sport: cricket\\\"}\",\n  \"stream\": false\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        416,
+        0
+      ],
+      "id": "c2ee796d-07d7-4bc7-8b59-aaffcc5b10ad",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://hzpxkldfqipzjlbtzqqs.supabase.co/rest/v1/memories",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "apikey",
+              "value": "sb_publishable_awYl7ZeiSsyOhF7XWMAmVg_84vygk9B"
+            },
+            {
+              "name": "Authorization",
+              "value": "Bearer sb_publishable_awYl7ZeiSsyOhF7XWMAmVg_84vygk9B"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "name": "Prefer",
+              "value": "return=representation"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n    \"user_id\": \"{{$json.user_id}}\",\n    \"memory_type\": \"career\",\n    \"memory\": \"{{$json.memory}}\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        1056,
+        0
+      ],
+      "id": "15d9d008-d28d-4642-9b0f-816ea4683df4",
+      "name": "HTTP Request1"
+    },
+    {
+      "parameters": {
+        "jsCode": "const raw = $json.response\n  .replace(/```json/g, \"\")\n  .replace(/```/g, \"\")\n  .trim();\n\nconst parsed = JSON.parse(raw);\n\nreturn [\n  {\n    json: {\n      user_id: $('Edit Fields').first().json.user_id,\n      memory_type: parsed.memory_type,\n      memory: parsed.memory\n    }\n  }\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        624,
+        0
+      ],
+      "id": "d6d49067-d81c-478b-b7fb-14a7455a551a",
+      "name": "PARSE_MEMORY_JSON"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "f5a4b489-f9dd-4ed6-a83a-10c841b8dae2",
+              "leftValue": "memory_type",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        832,
+        0
+      ],
+      "id": "69c30a52-0fc1-4528-9450-13a878d5e560",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "workflowInputs": {
+          "values": [
+            {
+              "name": "user_id"
+            },
+            {
+              "name": "user_message"
+            },
+            {
+              "name": "ai_response"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        -32,
+        0
+      ],
+      "id": "2e02b3e1-985b-46ef-a4ed-c60412457550",
+      "name": "When Executed by Another Workflow"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "c3a3bb32-482b-4d8e-8821-87f8e2b57a3a",
+              "name": "response",
+              "value": "={{ $json.memory }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1264,
+        0
+      ],
+      "id": "41ef8b0a-1d29-4039-912c-d82e3926d0c2",
+      "name": "Edit Fields1"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        []
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "PARSE_MEMORY_JSON",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "PARSE_MEMORY_JSON": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When Executed by Another Workflow": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request1": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "26f8d7fd-f264-439f-85f8-ca7c62393520",
+  "meta": {
+    "instanceId": "71298cc0a45d891fa7d10da2b065192bfba86e4a0d6df20ba65972a131dd3d3e"
+  },
+  "id": "IjFCQEkbDmpqN496",
+  "tags": []
+}

@@ -1,0 +1,418 @@
+{
+  "name": "UNIFIED_CHAT_AGENT_V1",
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "fadcebad-a17b-4b80-ae46-f009beaf1592",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "2b973aa3-f25a-409a-92ee-6addcb32a447",
+              "name": "user_id",
+              "value": "a913f8ed-cd7c-4caa-a137-7a8379dffb1a",
+              "type": "string"
+            },
+            {
+              "id": "11fe1e57-83dd-42cd-9655-747cf45ff125",
+              "name": "user_message",
+              "value": "improve linkedin",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        160,
+        16
+      ],
+      "id": "08736fb6-c9be-42ff-aed2-2793cb928e7e",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://127.0.0.1:11434/api/generate",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"model\": \"gemma3:4b\",\n  \"prompt\": \"You are an intent classifier.\\n\\nClassify the user's message into EXACTLY ONE of these categories:\\n\\nGENERAL\\nCAREER\\nGRATITUDE\\nGAME\\n\\nRules:\\n- LinkedIn, resume, internship, jobs, interviews, career advice → CAREER\\n- Thankfulness, gratitude, appreciation, journaling → GRATITUDE\\n- Tic tac toe, riddles, rock paper scissors, games → GAME\\n- Everything else → GENERAL\\n\\nReturn ONLY the category name. No explanation.\\n\\nUser message:\\n{{$json.user_message}}\",\n  \"stream\": false\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        320,
+        16
+      ],
+      "id": "95e1b52e-3c57-4e2c-a44f-73933b15930e",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "140577f2-7093-4d5a-aee6-c10b9a658678",
+              "name": "intent",
+              "value": "={{ $json.response.trim().toUpperCase() }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        496,
+        16
+      ],
+      "id": "668e4808-7dd9-419d-b6f3-f98a05097eec",
+      "name": "Edit Fields1"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{$json.intent}}",
+                    "rightValue": "CAREER",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "a43d8f67-5e68-488a-81f0-5221bca7b2e5"
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "c458d7c6-b415-4e1b-9668-fcc7b40c19f6",
+                    "leftValue": "={{$json.intent}}",
+                    "rightValue": "GRATITUDE",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "25d9dd05-17b3-421e-8e43-4a9ce4c8efe1",
+                    "leftValue": "={{$json.intent}}",
+                    "rightValue": "GAME",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "0a2f937a-2f62-458d-a352-ef97eb18b3c4",
+                    "leftValue": "={{$json.intent}}",
+                    "rightValue": "GENERAL",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [
+        672,
+        -16
+      ],
+      "id": "da556de3-417f-405e-aa8a-18ff25f50406",
+      "name": "Switch"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://127.0.0.1:11434/api/generate",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"model\": \"gemma3:4b\",\n  \"prompt\": \"You are MORO, a warm, empathetic gratitude companion.\\n\\nThe user wants to reflect on gratitude and positivity.\\n\\nUser message:\\n{{$('Edit Fields').first().json.user_message}}\\n\\nRespond kindly, encourage reflection, and keep the tone supportive and uplifting.\",\n  \"stream\": false\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        992,
+        -80
+      ],
+      "id": "856e73ec-1b4b-4b82-a2fc-bd9abff5d322",
+      "name": "GRATITUDE_RESPONSE"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://127.0.0.1:11434/api/generate",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"model\": \"gemma3:4b\",\n  \"prompt\": \"You are MORO Game AI.\\n\\nYou can play Tic-Tac-Toe, Rock-Paper-Scissors, riddles, trivia, and simple word games.\\n\\nUser request:\\n{{$('Edit Fields').first().json.user_message}}\\n\\nBe fun, interactive, and friendly. If starting a game, explain the rules clearly.\",\n  \"stream\": false\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        816,
+        256
+      ],
+      "id": "5d7ed0ca-5fbb-4667-8d79-6dd1861217cf",
+      "name": "GAME_RESPONSE"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://127.0.0.1:11434/api/generate",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"model\": \"gemma3:4b\",\n  \"prompt\": \"You are Gratify AI, a helpful, polite, and knowledgeable assistant.\\n\\nUser message:\\n{{$('Edit Fields').first().json.user_message}}\\n\\nProvide a clear, accurate, and friendly response.\",\n  \"stream\": false\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        1040,
+        112
+      ],
+      "id": "2484b25e-a849-4342-b308-23e23d4068b1",
+      "name": "GENERAL_RESPONSE"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://127.0.0.1:11434/api/generate",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"model\": \"gemma3:4b\",\n  \"prompt\": \"You are MORO Career AI, an expert career coach for students and fresh graduates.\\n\\nUser request:\\n{{$('Edit Fields').first().json.user_message}}\\n\\nGive practical, professional, and concise advice.\",\n  \"stream\": false\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        240,
+        -320
+      ],
+      "id": "738b3fe4-86a1-4a38-ae3d-953ad80150e8",
+      "name": "CAREER_RESPONSE"
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "W0HIdCc7XurQOi7N",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/W0HIdCc7XurQOi7N",
+          "cachedResultName": "CAREER_AGENT_V1"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "user_id": "={{$json.user_id}}",
+            "career_request": "={{$json.user_message}}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "user_id",
+              "displayName": "user_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "career_request",
+              "displayName": "career_request",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.3,
+      "position": [
+        816,
+        -160
+      ],
+      "id": "6d9cd58c-7cee-48e4-a46a-571a12700841",
+      "name": "Call 'CAREER_AGENT_V1'"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields1": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "Call 'CAREER_AGENT_V1'",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "GRATITUDE_RESPONSE",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "GENERAL_RESPONSE",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "GAME_RESPONSE",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "GENERAL_RESPONSE": {
+      "main": [
+        []
+      ]
+    },
+    "CAREER_RESPONSE": {
+      "main": [
+        []
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "fa3f405b-0de3-4a00-9b9b-4c21c78ae912",
+  "meta": {
+    "instanceId": "71298cc0a45d891fa7d10da2b065192bfba86e4a0d6df20ba65972a131dd3d3e"
+  },
+  "id": "gXNTwF5tWl2bGYxO",
+  "tags": []
+}

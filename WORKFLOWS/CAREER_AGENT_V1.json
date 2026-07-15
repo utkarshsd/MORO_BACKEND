@@ -1,0 +1,169 @@
+{
+  "name": "CAREER_AGENT_V1",
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -48,
+        -160
+      ],
+      "id": "9267a62b-75ac-4230-8423-ff1ec39da030",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://127.0.0.1:11434/api/generate",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"model\": \"gemma3:4b\",\n  \"prompt\": \"You are MORO Career AI, an expert career coach for students, fresh graduates, and software engineers.\\n\\nKnown information about the user:\\n{{$json.memory_context}}\\n\\nCurrent user request:\\n{{$json.user_message}}\\n\\nYour responsibilities:\\n- Help with career planning.\\n- Improve resumes and LinkedIn profiles.\\n- Suggest internships and job opportunities.\\n- Prepare users for technical interviews.\\n- Recommend projects and skills.\\n- Explain career paths in AI, ML, Software Engineering, Data Science, and related fields.\\n\\nRules:\\n- Personalize your advice using the user's memory only when it is relevant.\\n- If the memory is unrelated, ignore it.\\n- Give actionable and practical advice.\\n- Keep responses concise unless the user asks for detail.\\n- Never invent facts about the user.\",\n  \"stream\": false\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        416,
+        0
+      ],
+      "id": "6d0aae09-e2ee-4845-9784-de70e9228aa5",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "7ac3094d-25f0-4313-bc48-fa5615e9718b",
+              "name": "response",
+              "value": "={{$json.response}}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        624,
+        0
+      ],
+      "id": "8a9cb4f7-75ae-4465-a00d-75b64d1c25f0",
+      "name": "Edit Fields1"
+    },
+    {
+      "parameters": {
+        "workflowInputs": {
+          "values": [
+            {
+              "name": "user_id"
+            },
+            {
+              "name": "user_message"
+            },
+            {
+              "name": "memory_context"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        16,
+        0
+      ],
+      "id": "00b33e62-03a4-4aaf-90a7-eada9bf835f1",
+      "name": "When Executed by Another Workflow"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "e620561a-2cfe-450a-893f-563101b168b7",
+              "name": "user_id",
+              "value": "={{ $json.user_id }}",
+              "type": "string"
+            },
+            {
+              "id": "5b0cd6d5-6e3e-4d30-af6d-146c281acd5b",
+              "name": "user_message",
+              "value": "={{ $json.user_message }}",
+              "type": "string"
+            },
+            {
+              "id": "9a05c215-beee-4cb5-b42a-1fdcf0008f5b",
+              "name": "memory_context",
+              "value": "={{ $json.memory_context }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        208,
+        0
+      ],
+      "id": "a10ddf31-53f3-43dd-a304-7c2d3523ede9",
+      "name": "Edit Fields"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        []
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When Executed by Another Workflow": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "fd346014-690e-4e89-a2f1-70a687a67f22",
+  "meta": {
+    "instanceId": "71298cc0a45d891fa7d10da2b065192bfba86e4a0d6df20ba65972a131dd3d3e"
+  },
+  "id": "W0HIdCc7XurQOi7N",
+  "tags": []
+}

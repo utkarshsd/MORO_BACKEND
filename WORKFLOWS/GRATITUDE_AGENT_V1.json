@@ -1,0 +1,169 @@
+{
+  "name": "GRATITUDE_AGENT_V1",
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -80,
+        -160
+      ],
+      "id": "32ba6d2c-1d4a-4731-8f12-f9afc77c46d8",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "038269f9-88cd-470e-868f-c99506b3d47f",
+              "name": "user_message",
+              "value": "={{ $json.user_message }}",
+              "type": "string"
+            },
+            {
+              "id": "0e50334b-d49b-4fbb-9cef-6bd2b3d81b70",
+              "name": "memory_context",
+              "value": "={{ $json.memory_context }}",
+              "type": "string"
+            },
+            {
+              "id": "7ca08776-6bc8-4332-b8db-3b8d9eb94ab3",
+              "name": "user_id",
+              "value": "={{ $json.user_id }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        208,
+        0
+      ],
+      "id": "2aa855fd-5f03-48da-b9b2-30f649ae9cfc",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://127.0.0.1:11434/api/generate",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"model\": \"gemma3:4b\",\n  \"prompt\": \"You are MORO Gratitude AI, a supportive companion focused on gratitude, reflection, and emotional wellbeing.\\n\\nKnown information about the user:\\n{{$json.memory_context}}\\n\\nCurrent user message:\\n{{$json.user_message}}\\n\\nYour responsibilities:\\n- Encourage gratitude.\\n- Help users reflect positively.\\n- Ask thoughtful follow-up questions.\\n- Support healthy habits and journaling.\\n- Celebrate small wins.\\n\\nRules:\\n- Respond warmly and naturally.\\n- Use stored memories only if they help personalize the response.\\n- Never sound robotic.\\n- Do not provide medical or psychological diagnoses.\\n- Keep the conversation uplifting.\\n- End with a gentle follow-up question whenever appropriate.\",\n  \"stream\": false\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        416,
+        0
+      ],
+      "id": "d113ee41-b072-4b3c-a004-14952664c6b0",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "1dbce697-80c7-4ca4-b2ae-5d04b48bbefa",
+              "name": "response",
+              "value": "={{ $json.gratitude_response }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        576,
+        16
+      ],
+      "id": "0afbe6e0-99f5-40c5-951a-3bfdea2c7fac",
+      "name": "Edit Fields1"
+    },
+    {
+      "parameters": {
+        "workflowInputs": {
+          "values": [
+            {
+              "name": "user_id"
+            },
+            {
+              "name": "user_message"
+            },
+            {
+              "name": "memory_context"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        -16,
+        16
+      ],
+      "id": "464dd174-8750-46d5-9f4c-4bcfff957785",
+      "name": "When Executed by Another Workflow"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        []
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When Executed by Another Workflow": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "cf188a20-870b-4fc5-bd04-d462880201ca",
+  "meta": {
+    "instanceId": "71298cc0a45d891fa7d10da2b065192bfba86e4a0d6df20ba65972a131dd3d3e"
+  },
+  "id": "XQeWeGForSYrMHgE",
+  "tags": []
+}
