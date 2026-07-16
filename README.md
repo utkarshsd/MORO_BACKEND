@@ -42,6 +42,20 @@ Designed with scalability in mind, MORO acts as the foundation for a production-
 <p align="center">
   <img src="docs/images/architecture.png" width="100%" alt="MORO Architecture">
 </p>
+## 📚 API Documentation
+
+MORO exposes a REST API powered by **FastAPI** with interactive Swagger documentation.
+
+<p align="center">
+  <img src="docs/images/api.png" width="100%" alt="MORO API Documentation">
+</p>
+
+### Available Endpoints
+
+| Method | Endpoint | Description |
+|---------|----------|-------------|
+| GET | `/` | Health check |
+| POST | `/chat` | Send user messages to the AI orchestrator |
 
 # 🏗️ Tech Stack
 
