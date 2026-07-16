@@ -11,9 +11,13 @@
 ![Supabase](https://img.shields.io/badge/Supabase-Database-3ECF8E?logo=supabase)
 ![Ollama](https://img.shields.io/badge/Ollama-LLM-black)
 ![GitHub](https://img.shields.io/badge/OpenSource-GitHub-lightgrey?logo=github)
-An AI-powered personal assistant backend built using **FastAPI**, **n8n**, **Ollama**, and **Supabase**.
+## 🚀 Overview
 
-MORO is designed as a modular multi-agent AI system capable of handling career guidance, memory management, gratitude journaling, gaming, and future AI services through a centralized orchestrator.
+MORO AI is a modular AI assistant backend built using FastAPI, n8n, Ollama, and Supabase.
+
+It follows a multi-agent architecture where specialized AI agents collaborate to provide intelligent responses, memory management, career guidance, gratitude journaling, and future AI services.
+
+Designed with scalability in mind, MORO acts as the foundation for a production-ready AI assistant platform.
 
 ---
 
