@@ -1,6 +1,7 @@
 <p align="center">
-<img src=""C:\Users\ASUS\OneDrive\Desktop\Moro_backened\docs\images\banner.png.png"">
+  <img src="docs/images/banner.png" alt="MORO AI Banner" width="100%">
 </p>
+
 
 # 🤖 MORO AI
 
