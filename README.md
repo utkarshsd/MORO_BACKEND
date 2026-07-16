@@ -4,6 +4,13 @@
 
 # 🤖 MORO AI
 
+
+![Python](https://img.shields.io/badge/Python-3.11-blue?logo=python)
+![FastAPI](https://img.shields.io/badge/FastAPI-Backend-green?logo=fastapi)
+![n8n](https://img.shields.io/badge/n8n-Automation-orange?logo=n8n)
+![Supabase](https://img.shields.io/badge/Supabase-Database-3ECF8E?logo=supabase)
+![Ollama](https://img.shields.io/badge/Ollama-LLM-black)
+![GitHub](https://img.shields.io/badge/OpenSource-GitHub-lightgrey?logo=github)
 An AI-powered personal assistant backend built using **FastAPI**, **n8n**, **Ollama**, and **Supabase**.
 
 MORO is designed as a modular multi-agent AI system capable of handling career guidance, memory management, gratitude journaling, gaming, and future AI services through a centralized orchestrator.
