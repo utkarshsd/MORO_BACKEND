@@ -37,6 +37,11 @@ Designed with scalability in mind, MORO acts as the foundation for a production-
 - 📡 API Gateway
 
 ---
+## 🏗️ Architecture
+
+<p align="center">
+  <img src="docs/images/architecture.png" width="100%" alt="MORO Architecture">
+</p>
 
 # 🏗️ Tech Stack
 
