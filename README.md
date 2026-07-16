@@ -1,3 +1,7 @@
+<p align="center">
+<img src="docs/images/banner.png">
+</p>****
+
 # 🤖 MORO AI
 
 An AI-powered personal assistant backend built using **FastAPI**, **n8n**, **Ollama**, and **Supabase**.
