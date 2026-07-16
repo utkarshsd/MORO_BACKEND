@@ -1,6 +1,6 @@
 <p align="center">
 <img src="docs/images/banner.png">
-</p>****
+</p>
 
 # 🤖 MORO AI
 
